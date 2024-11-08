@@ -1,4 +1,3 @@
-%1
 clear all; clc;
 folderpath = 'D:\서울대\5-1\intern\brain_volume\';
 
@@ -66,11 +65,9 @@ for k = 1:length(c_filename)
     for i = 1:22
         fgetl(fileID);
     end
-    % 23번째 줄에서 뇌 총 부피 값 추출
     line = fgetl(fileID);
     volume = strsplit(line, ',');
-    volume = strtrim(volume{4}); % 값 추출
-    % mm^3 단위로 변환하여 저장
+    volume = strtrim(volume{4});
     volumes(k) = str2double(volume);
     
     for i=23:27%ICV
@@ -147,7 +144,6 @@ end
 k=setdiff(who, {'r_allfiles','l_allfiles', 'ICVs','volumes','allfiles'});
 clear(k{:});%1
 
-%%
 xaxis_limit=1;
 cutoff=9000;
 
@@ -200,7 +196,6 @@ grayvol_non_zero=grayvol(non_zero_indices);
 sex_non_zero = strrep(sex_non_zero, '남', 'M');
 sex_non_zero = strrep(sex_non_zero, '여', 'F');
 %% plot
-% 산점도
 [R,P] = corr(PA_non_zero, grayvol_non_zero);
 sprintf("correlation:%f P value:%f",R,P)
 mdl = fitlm(PA_non_zero, grayvol_non_zero);
@@ -208,10 +203,9 @@ r_squared = mdl.Rsquared.Ordinary;
 p_value = mdl.Coefficients.pValue;
 plot(PA_non_zero, grayvol_non_zero,'.')
 hold on; 
-x_range = [min(PA_non_zero), max(PA_non_zero)]; % x 축 범위
+x_range = [min(PA_non_zero), max(PA_non_zero)];
 y_pred = mdl.Coefficients.Estimate(1) + mdl.Coefficients.Estimate(2) * x_range; 
 
-% 산점도- 회귀선 그리기
 plot(x_range, y_pred, 'k-', 'LineWidth', 2);
 xlabel('age');
 ylabel('grayvol');
@@ -272,7 +266,7 @@ edugroup_non_zero=edugroup(non_zero_indices);
         edugroup_non_zero=edugroup_non_zero(cutoffPA_indices);
     end
 
-% 각 조합에 대한 라벨 생성.. for character ones..
+%for character ones
 data = cell(4, 1);
 label = cell(4, 1);
 for k= 1:2
@@ -307,7 +301,7 @@ end
 all_text = [];
 for i = 1:numel(label)
     allt=cellstr(label{i, 1});
-    all_text = vertcat(all_text,allt); % 각 셀의 문자열에서 양쪽 공백을 제거한 후 공백으로 결합
+    all_text = vertcat(all_text,allt);
 end
 figure;
 boxplot(cell2mat(data),all_text)
@@ -359,10 +353,9 @@ r_squared = mdl.Rsquared.Ordinary;
 p_value = mdl.Coefficients.pValue;
 plot(variant, ROI,'.')
 hold on; 
-x_range = [min(variant), max(variant)]; % x 축 범위
+x_range = [min(variant), max(variant)];
 y_pred = mdl.Coefficients.Estimate(1) + mdl.Coefficients.Estimate(2) * x_range; 
 
-% 산점도- 회귀선 그리기
 plot(x_range, y_pred, 'k-', 'LineWidth', 2);
 hold off
  
@@ -406,10 +399,9 @@ p_value = mdl.Coefficients.pValue;
 figure;
 plot(variant, ROI,'.')
 hold on; 
-x_range = [min(variant), max(variant)]; % x 축 범위
+x_range = [min(variant), max(variant)];
 y_pred = mdl.Coefficients.Estimate(1) + mdl.Coefficients.Estimate(2) * x_range; 
 
-% 산점도- 회귀선 그리기
 plot(x_range, y_pred, 'k-', 'LineWidth', 2);
 hold off
 
