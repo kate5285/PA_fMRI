@@ -164,7 +164,7 @@ tab = table(names, task,rv, pv, 'VariableNames', {'Name','task', 'r', 'p'});
 disp(tab);
 
 nm = ["what", "where", "when"]; 
-P=1;%정확도 중 어디를 볼 것인지
+P=1; which type of accuracy do you choose to look at
 rv=[];pv=[];names=[];
 for h=1:numel(l_combined{1,1}.name)
  for i = 1:numel(l_combined)
