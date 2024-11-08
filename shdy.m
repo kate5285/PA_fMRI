@@ -1,4 +1,3 @@
-%1
 clear all; 
 exfilename= "D:\서울대\5-1\intern\s_updated.xlsx";
 behavok= readcell(exfilename, 'Sheet', 1, 'Range', 'C3:C264');
@@ -25,11 +24,9 @@ opartici=oparti(allok);
 %%
 folderpath = 'D:\서울대\5-1\intern\brain_volume\';
 
-% 모든 파일 목록 불러오기
 c_filenames = [dir(fullfile(folderpath, '*_rh.aparc.stats')), dir(fullfile(folderpath, '*_lh.aparc.stats'))];
 filenames = dir(fullfile(folderpath, '*_aseg.stats'));
 
-% 선택된 파일들을 처리하는 코드
 g_allfiles = cell(length(opartici), 1);
 volumes = zeros(length(opartici), 1); 
 ICVs = zeros(length(opartici), 1);
@@ -37,10 +34,10 @@ ICVs = zeros(length(opartici), 1);
 for files = 1:2
     for k = 1:length(c_filenames)
         filename = c_filenames(k, files).name;
-        % 파일명에서 피험자 번호 추출
+        % extract sbj number from file name
         subj_num_str = regexp(filename, '^\d+', 'match', 'once');
         subj_num = str2double(subj_num_str);
-        % 피험자 번호가 partici에 있는지 확인
+        % check if the sbj number is on the participant list
         if ismember(subj_num, opartici)
             fileID = fopen(fullfile(folderpath, filename), 'r');
             headername = cell(1, 10);%header names go here
@@ -98,11 +95,11 @@ for files = 1:2
             for i = 1:22
                 fgetl(fileID);
             end
-            % 23번째 줄에서 뇌 총 부피 값 추출
+            % extract brain vol
             line = fgetl(fileID);
             volume = strsplit(line, ',');
-            volume = strtrim(volume{4}); % 값 추출
-            % mm^3 단위로 변환하여 저장
+            volume = strtrim(volume{4});
+            % mm^3 
             volumes(k) = str2double(volume);
 
             for i = 23:27 % ICV
@@ -125,10 +122,8 @@ end
 % subcortical
 for k = 1:length(filenames)
     filename = filenames(k).name;
-    % 파일명에서 피험자 번호 추출
     subj_num_str = regexp(filename, '^\d+', 'match', 'once');
     subj_num = str2double(subj_num_str);
-    % 피험자 번호가 partici에 있는지 확인
     if ismember(subj_num, opartici)
         fileID = fopen(fullfile(folderpath, filename), 'r');
         headername = cell(1, 10);%header names go here
@@ -195,7 +190,6 @@ allfiles=allfiles.';
 c_filenames = [dir(fullfile(folderpath, '*_rh.aparc.stats')), dir(fullfile(folderpath, '*_lh.aparc.stats'))];
 filenames = dir(fullfile(folderpath, '*_aseg.stats'));
 
-% 선택된 파일들을 처리하는 코드
 g_allfiles = cell(length(mpartici), 1);
 mvolumes = zeros(length(mpartici), 1); 
 mICVs = zeros(length(mpartici), 1);
@@ -203,10 +197,8 @@ mICVs = zeros(length(mpartici), 1);
 for files = 1:2
     for k = 1:length(c_filenames)
         filename = c_filenames(k, files).name;
-        % 파일명에서 피험자 번호 추출
         subj_num_str = regexp(filename, '^\d+', 'match', 'once');
         subj_num = str2double(subj_num_str);
-        % 피험자 번호가 partici에 있는지 확인
         if ismember(subj_num, mpartici)
             fileID = fopen(fullfile(folderpath, filename), 'r');
             headername = cell(1, 10);%header names go here
@@ -264,11 +256,9 @@ for files = 1:2
             for i = 1:22
                 fgetl(fileID);
             end
-            % 23번째 줄에서 뇌 총 부피 값 추출
             line = fgetl(fileID);
             mvolume = strsplit(line, ',');
-            mvolume = strtrim(mvolume{4}); % 값 추출
-            % mm^3 단위로 변환하여 저장
+            mvolume = strtrim(mvolume{4});
             mvolumes(k) = str2double(mvolume);
 
             for i = 23:27 % ICV
@@ -291,10 +281,8 @@ end
 % subcortical
 for k = 1:length(filenames)
     filename = filenames(k).name;
-    % 파일명에서 피험자 번호 추출
     subj_num_str = regexp(filename, '^\d+', 'match', 'once');
     subj_num = str2double(subj_num_str);
-    % 피험자 번호가 partici에 있는지 확인
     if ismember(subj_num, mpartici)
         fileID = fopen(fullfile(folderpath, filename), 'r');
         headername = cell(1, 10);%header names go here
@@ -421,15 +409,14 @@ high_participants=high_to_low_hpf(1:floor(numel(opartici)/2),1);
 low_participants=high_to_low_hpf(floor(numel(opartici)/2)+2:end,1);
 % k = setdiff(who, {'high_participants','low_participants','median_participant','high_to_low_hpf'});
 % clear(k{:});
-
-%확인용 
+ 
 figure;
  for i=1:numel(opartici)
      plot(i,hpf_ratio(find(opartici==high_to_low_hpf(i)),1),'.')
      hold on;
  end
  hold off;
-%비율이 높은데에서 낮은 순으로 정리한 게 sort_hpf_ratio이고, 이에 해당되는 라벨이 high_to_low_hpf임
+% sort_hpf_ratio goes from the highest to lowest ratio, high_to_low_hpf is the label for it
 
 % hpfrat = table(high_to_low_hpf, sort_hpf_ratio, 'VariableNames', {'person_idx', 'hpf_ratio'});
 % save_path = 'D:\서울대\5-1\intern\old_hpf.mat';
@@ -450,11 +437,11 @@ age= xlsread(PAfilename, 3, sprintf('D3:D%d', numRows + 2));
 PA= xlsread(PAfilename, 3, sprintf('AG3:AG%d', numRows + 2));
 education= xlsread(PAfilename, 3, sprintf('E3:E%d', numRows + 2));
 subj_nums=xlsread(PAfilename, 3, sprintf('B3:B%d', numRows + 2));
-%% behavior가 ㅇㅋ인 사람들 골라내기
+%% sort out only those with behavioral data
 
-%PA가 0인 사람들 제외
+%exclude those with 0 PA
 zeroPA_indices = find(isnan(PA));
-%PA 안 봐도 되면 (그냥 acc랑 바로 corr 볼거면)
+%if you don't wish to look at PA
 % non_zero_indices = 1:numel(allfiles);
 non_zero_indices = setdiff(1:numel(PA), zeroPA_indices);
 PA_non_zero = PA(non_zero_indices);
@@ -579,7 +566,6 @@ hold on;
 x_range = [min(variant), max(variant)]; % x 축 범위
 y_pred = mdl.Coefficients.Estimate(1) + mdl.Coefficients.Estimate(2) * x_range; 
 
-% 산점도- 회귀선 그리기
 plot(x_range, y_pred, 'k-', 'LineWidth', 2);
  xlabel("age")
  ylabel("dlPFC")
@@ -591,14 +577,12 @@ www=["what","where","when"];
 pv=[];
 for i = 2:4   % www
     figure;
-    % 점
     [r, p] = corr(PA_mid_old{:,1}, PA_mid_old{:,i});
     pv=[pv;p];
     fprintf("%s: p = %f, r =  %f\n",www(i-1),p,r)
     mdl = fitlm(PA_mid_old{:,1}, PA_mid_old{:,i});
     plot(PA_mid_old{:,1}, PA_mid_old{:,i}, '.')
     hold on
-    % 선
     x_range = [min(PA_mid_old{:,1}), max(PA_mid_old{:,1})];
     y_pred = mdl.Coefficients.Estimate(1) + mdl.Coefficients.Estimate(2) * x_range; 
     plot(x_range, y_pred, 'k-', 'LineWidth', 2);
@@ -614,7 +598,7 @@ for i = 2:4   % www
     end
 end
 
-%% PA outlier 제거
+%% remove PA outliers
 [b,PAoutliers]=rmoutliers(PA_non_zero);
 nooutlierPArow=find(ismember(PA_non_zero, b));
 
@@ -625,10 +609,10 @@ PAnp = table(rel_filtered.participant, subj_nums_non_zero, b, rel_filtered.accur
 
 PAnp_sorted = sortrows(PAnp, 'PA');
 n = height(PAnp);
-group_size = floor(n / 4);  % 각 그룹의 기본 크기
-remainder = mod(n, 4);  % 나머지 값 (균등하게 나누어지지 않을 경우)
+group_size = floor(n / 4);
+remainder = mod(n, 4);
 
-groups = cell(4, 3);  % 그룹을 저장할 셀 배열
+groups = cell(4, 3);
 start_idx = 1;
 for i = 1:4
     if i <= remainder
@@ -652,7 +636,6 @@ for i = 1:4
     ses(i) = std(data) / sqrt(length(data));
 end
 
-% 바 그래프 그리기
 figure('Color', 'white');
 bar(means);
 hold on;
@@ -667,17 +650,13 @@ PA_mid_old= table(subj_nums_non_zero, b,age_non_zero,education_non_zero,hpf_rati
 variables = {'PA', 'Age', 'Edu', 'ratio'};
 combinations = nchoosek(variables, 2);
 
-% 그래프 저장 경로
 save_path = 'D:\서울대\5-1\intern\figure\';
 
-% 모든 조합에 대해 모델 적합 및 그래프 저장
 for i = 1:size(combinations, 1)
     predictorVars = combinations(i, :);
-    
-    % 모델 적합
+
     mdl = fitlm(PA_mid_old, 'quadratic', 'ResponseVar', 'rel_accuracy2', 'PredictorVars', predictorVars)
-    
-    % 그래프 생성
+
     figure('Color', 'white');
     figure1 = plot(mdl);
     xlabel(predictorVars{1});
@@ -689,12 +668,10 @@ for i = 1:size(combinations, 1)
     
     box off;
     legend('off');
-    
-    % 그래프 저장
+
     % save_filename = [save_path, 'Where ', predictorVars{1}, '_', predictorVars{2}, '.png'];
     % saveas(gcf, save_filename);
-    
-    % 그래프 닫기
+
     close(gcf);
 end
 
@@ -721,7 +698,7 @@ for i = 3:5   % www
         title('when')
     end
 end
-%% rel acc outlier도 제거
+%% remove rel acc outlier
 for i = 3:5
 
     if i==3
@@ -749,13 +726,11 @@ for i = 3:5
     end
 
     figure;
-    % 점
     [r, p] = corr(rPA,out);
     fprintf("p = %f, r =  %f\n",p,r)
     mdl = fitlm(rPA, out);
     plot(rPA, out, '.')
     hold on
-    % 선
     x_range = [min(rPA), max(rPA)];
     y_pred = mdl.Coefficients.Estimate(1) + mdl.Coefficients.Estimate(2) * x_range; 
     plot(x_range, y_pred, 'k-', 'LineWidth', 2);
@@ -788,7 +763,6 @@ save_path ="D:\서울대\5-1\intern\figure\";
 % rows=find(rw==0);
 % data = data(rows, :);
 
-%
 mdl = fitlm(data, 'linear', 'ResponseVar', 'dl PFC', 'PredictorVars', {'Sex', 'Education','Age','ICV'})
 for i=1:3
 [r, p] = corr(rel_filtered.(['accuracy' num2str(i)]),mdl.Fitted);
@@ -799,13 +773,12 @@ figure;
 plot(rel_filtered.(['accuracy' num2str(i)]),mdl.Fitted,'.')
 % plot(data.PA,mdl.Fitted,'.')
 hold on; 
-x_range = [min(rel_filtered.(['accuracy' num2str(i)])), max(rel_filtered.(['accuracy' num2str(i)]))]; % x 축 범위
+x_range = [min(rel_filtered.(['accuracy' num2str(i)])), max(rel_filtered.(['accuracy' num2str(i)]))];
 md = fitlm(rel_filtered.(['accuracy' num2str(i)]),mdl.Fitted);
-% x_range = [min(data.PA), max(data.PA)]; % x 축 범위
+% x_range = [min(data.PA), max(data.PA)];
 % md = fitlm(data.PA,mdl.Fitted);
 
 y_pred = md.Coefficients.Estimate(1) + md.Coefficients.Estimate(2) * x_range; 
-% 산점도- 회귀선 그리기
 plot(x_range, y_pred, 'k-', 'LineWidth', 2);
 title(nm{i});
 xlabel('accuracy');
@@ -895,10 +868,10 @@ where='hp';
         plot(mPA_non_zero(mrrow),kmnorel_filtered.(['accuracy' num2str(P)]),'r.')
         % plot(rel_filtered.(['accuracy' num2str(P)]), ROI_adj,'.')
 
-        x_range = [min(oPA_non_zero(rrow)), max(oPA_non_zero(rrow))]; % x 축 범위
+        x_range = [min(oPA_non_zero(rrow)), max(oPA_non_zero(rrow))];
         md = fitlm(oPA_non_zero(rrow),knorel_filtered.(['accuracy' num2str(P)]));
 
-        mx_range = [min(mPA_non_zero(mrrow)), max(mPA_non_zero(mrrow))]; % x 축 범위
+        mx_range = [min(mPA_non_zero(mrrow)), max(mPA_non_zero(mrrow))];
         mmd = fitlm(mPA_non_zero(mrrow),kmnorel_filtered.(['accuracy' num2str(P)]));
         % md = fitlm(rel_filtered.(['accuracy' num2str(P)]),ROI_adj);
         y_pred = md.Coefficients.Estimate(1) + md.Coefficients.Estimate(2) * x_range; 
@@ -922,7 +895,6 @@ tab = table(names, task,rv, pv, 'VariableNames', {'Name','task', 'r', 'p'})
 
 disp('mid')
 mtab = table(mnames, mtask,mrv, mpv, 'VariableNames', {'Name','task', 'r', 'p'})
-%% PA outlier 제거
 PAnp = table(knorel_filtered.participant, oPA_non_zero(rrow), knorel_filtered.accuracy1, knorel_filtered.accuracy2, knorel_filtered.accuracy3, ...
              'VariableNames', {'sh', 'PA', 'What', 'Where', 'When'});
 
@@ -931,10 +903,10 @@ mPAnp = table(kmnorel_filtered.participant, mPA_non_zero(mrrow), kmnorel_filtere
 
 PAnp_sorted = sortrows(PAnp, 'PA');
 n = height(PAnp);
-group_size = floor(n / 4);  % 각 그룹의 기본 크기
-remainder = mod(n, 4);  % 나머지 값 (균등하게 나누어지지 않을 경우)
+group_size = floor(n / 4);
+remainder = mod(n, 4);
 
-groups = cell(4, 3);  % 그룹을 저장할 셀 배열
+groups = cell(4, 3);
 start_idx = 1;
 for i = 1:4
     if i <= remainder
@@ -1006,10 +978,10 @@ end
 
 PAnp_sorted = sortrows(mPAnp, 'PA');
 n = height(mPAnp);
-group_size = floor(n / 4);  % 각 그룹의 기본 크기
-remainder = mod(n, 4);  % 나머지 값 (균등하게 나누어지지 않을 경우)
+group_size = floor(n / 4);
+remainder = mod(n, 4);
 
-mgroups = cell(4, 3);  % 그룹을 저장할 셀 배열
+mgroups = cell(4, 3);
 start_idx = 1;
 for i = 1:4
     if i <= remainder
@@ -1018,7 +990,6 @@ for i = 1:4
         end_idx = start_idx + group_size - 1;
     end
     
-
     mgroups{i, 1} = PAnp_sorted.What(start_idx:end_idx);
     mgroups{i, 2} = PAnp_sorted.Where(start_idx:end_idx);
     mgroups{i, 3} = PAnp_sorted.When(start_idx:end_idx);
@@ -1077,14 +1048,14 @@ hold off;
 end
 end
 %%
-pgo=1; %PA조합으로 볼거면 1 나이 조합이면 0. groups가 old, mgroups가 mid
-P=3;%what이 1 where가 2 when이 3
+pgo=1; %for PA, set this value to 1. For age, 0. groups are for old, mgroups are for middle-aged.
+P=3;%what is 1, where is 2, when is 3
 
 pjohap=[1 2;1 3;1 4;2 3;2 4;3 4];
 
 if pgo==1
 for i=1:size(pjohap,1)
-    a =groups{pjohap(i,1),P}; %group에서 4는 PA 3은 WWWs
+    a =groups{pjohap(i,1),P}; %in a group, 4 is for PA, 3 is for WWWs
     b = groups{pjohap(i,2),P};
     %what
     x_1 = a;
@@ -1101,7 +1072,7 @@ end
 
 elseif pgo==0
 for i=1:4
-a =groups{i,P}; %PA 1로 통일, 나이만 다르게
+a =groups{i,P};
 b = mgroups{i,P};
 %what
 x_1 = a;
@@ -1142,7 +1113,7 @@ end
         % figure;
         % plot(rel_filtered.(['accuracy' num2str(P)]), ROI_adj,'.')
         % hold on;
-        % x_range = [min(rel_filtered.(['accuracy' num2str(P)])), max(rel_filtered.(['accuracy' num2str(P)]))]; % x 축 범위
+        % x_range = [min(rel_filtered.(['accuracy' num2str(P)])), max(rel_filtered.(['accuracy' num2str(P)]))];
         % md = fitlm(rel_filtered.(['accuracy' num2str(P)]),ROI_adj);
         % y_pred = md.Coefficients.Estimate(1) + md.Coefficients.Estimate(2) * x_range; 
         % plot(x_range,y_pred,'k-','LineWidth',2);
@@ -1159,7 +1130,7 @@ where='HP';
         end
         % roi = (r_roi+l_roi)./mICVs;
         roi = mhippo./mICVs;
-        %PA할 때 non_zero_indices
+
         data = table(roi, age(mallok), msex_binary(mallok), education(mallok), mICVs, PA(mallok), ...
                      'VariableNames', {'ROI', 'Age', 'Sex', 'Education', 'ICV', 'PA'});
         mdl = fitlm(data, 'linear', 'ResponseVar', 'ROI', 'PredictorVars', {'Sex', 'Education'});
@@ -1171,10 +1142,10 @@ figure;
 plot(data.(factor),mdl.Fitted,'.')
 % plot(data.(factor),roi,'.')
 hold on; 
-x_range = [min(data.(factor)), max(data.(factor))]; % x 축 범위
+x_range = [min(data.(factor)), max(data.(factor))];
 md = fitlm(data.(factor),mdl.Fitted);
 
-%2차일때
+%polynomial fit
 % md = fitlm(data.(factor),mdl.Fitted,'poly2')
 % figure;
 % set(gca,'FontSize',13)
@@ -1183,7 +1154,6 @@ md = fitlm(data.(factor),mdl.Fitted);
 % plot(md)
 
 y_pred = md.Coefficients.Estimate(1) + md.Coefficients.Estimate(2) * x_range; 
-% 산점도- 회귀선 그리기
 plot(x_range, y_pred, 'k-', 'LineWidth', 2);
 % title(nm{i});       
 set(gca, 'FontSize', 13);
@@ -1220,7 +1190,7 @@ figure;
 % plot(md.Fitted,mdl.Fitted,'.')
 plot(data.hp,data.pfc,'.')
 hold on; 
-% x_range = [min(md.Fitted), max(md.Fitted)]; % x 축 범위
+% x_range = [min(md.Fitted), max(md.Fitted)];
 x_range = [min(data.hp), max(data.hp)];
 % Md = fitlm(md.Fitted,mdl.Fitted);
 Md = fitlm(data.hp,data.pfc);
@@ -1230,7 +1200,7 @@ xlabel('\Delta HP');
 ylabel('\Delta pfc');
 hold off;
 [r,p]=corr(data.hp,data.pfc)
-%% 영역 중 acc랑 p val 작은 거에서 높은 순으로 정렬
+
 rv=[];pv=[];names=[];
 
 onearea=[9;10;11;14;33;34;37;40];
