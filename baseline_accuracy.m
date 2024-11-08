@@ -1,8 +1,6 @@
-%% 피험자 accuracy 정리
-%% WWW_survey 엑셀 불러오기
 T_1 = readtable('\\147.47.66.155\public\Interns\전시현\WWW_survey.xlsx', 'Sheet', 'data_rejection');
 
-%% 피험자 번호/What/Where/When
+%% sbj num/What/Where/When
 common_folder = '\\147.47.66.155\public\Interns\전시현\www_behavior';
 folders = dir(fullfile(common_folder, '*_*_*'));
 sbj = 1;
@@ -41,7 +39,7 @@ end
 
 nonzero_idx = find(acc(:, 2) ~= 0);
 
-%% data_label에 따라 분류
+%% sort by data_label
 unique_num = unique(T_1(:,5));
 label_number = cell(height(unique_num),1);
 
@@ -49,7 +47,7 @@ for i = 1:height(unique_num)
     label_number{i} = T_1(T_1{:,5} == i,1);
 end
 
-%% label별로 acc 나누기
+%% sort acc by data label
 grouped_acc = cell(length(label_number), 1);
 
 for i = 1:length(label_number)
@@ -65,7 +63,7 @@ for i = 1:length(label_number)
     grouped_acc{i} = current_data;
 end
 
-%% mean accuracy 구하기
+%% calculate mean accuracy
 mean_acc = cell(length(grouped_acc), 3);
 
 for i = 1:length(grouped_acc)
@@ -78,7 +76,6 @@ for i = 1:length(grouped_acc)
     mean_acc{i,3} = mean(acc3);
 end
 
-%% label_2를 label_1 평균으로 나누기
 relative_dementia = cell(3,1);
 relative_label = table();
 relative_label.participant = grouped_acc{2}.participant;
@@ -88,7 +85,6 @@ relative_label.accuracy3 = grouped_acc{2}.accuracy3/mean_acc{1,3};
 
 relative_dementia{1} = relative_label;
 
-%% label_4를 label_3 평균으로 나누기
 relative_label = table();
 relative_label.participant = grouped_acc{4}.participant;
 relative_label.accuracy1 = grouped_acc{4}.accuracy1/mean_acc{3,1};
@@ -97,7 +93,6 @@ relative_label.accuracy3 = grouped_acc{4}.accuracy3/mean_acc{3,3};
 
 relative_dementia{2} = relative_label;
 
-%% label_5를 label_3 평균으로 나누기
 relative_label = table();
 relative_label.participant = grouped_acc{5}.participant;
 relative_label.accuracy1 = grouped_acc{5}.accuracy1/mean_acc{3,1};
