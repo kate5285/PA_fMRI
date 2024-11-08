@@ -4,7 +4,7 @@ filename = dir(fullfile(folderpath, '*_aseg.stats'));
 allfiles = cell(length(filename), 1);
 volumes = zeros(length(allfiles), 1); 
 ICVs= zeros(length(allfiles), 1);
-%1
+
 clear all; clc;
 folderpath = 'D:\서울대\5-1\intern\brain_volume\';
 
@@ -72,11 +72,9 @@ for k = 1:length(c_filename)
     for i = 1:22
         fgetl(fileID);
     end
-    % 23번째 줄에서 뇌 총 부피 값 추출
     line = fgetl(fileID);
     volume = strsplit(line, ',');
-    volume = strtrim(volume{4}); % 값 추출
-    % mm^3 단위로 변환하여 저장
+    volume = strtrim(volume{4});
     volumes(k) = str2double(volume);
     
     for i=23:27%ICV
@@ -169,7 +167,6 @@ for i=1:size(PA,1)
 hippo(i,1)=(allfiles{i,1}.Volume_mm3(12,1)+allfiles{i,1}.Volume_mm3(27,1));
 end
 
-%PA가 0인 사람들 제외
 zeroPA_indices = find(isnan(PA));
 non_zero_indices = setdiff(1:numel(PA), zeroPA_indices);
 PA_non_zero = PA(non_zero_indices);
@@ -197,13 +194,12 @@ education_non_zero = education(non_zero_indices);
 sex_non_zero = strrep(sex_non_zero, '남', 'M');
 sex_non_zero = strrep(sex_non_zero, '여', 'F');
 %% volume adjustment using ICV
-% b is the slope of the linear regression between Volume(Raw) and ICV->근데 이거 느낌상 b 구할 때 x축에 volume말고 ICV 들어가야할 거 같음.
+% b is the slope of the linear regression between Volume(Raw) and ICV
 meanICV=mean(ICV_non_zero);
 mdl = fitlm(ICV_non_zero,volumes_non_zero);
 b=mdl.Coefficients.Estimate(2);
 volumes_non_zero_adj= volumes_non_zero-b*(ICV_non_zero-meanICV);
 %% plot
-% 산점도
 ROI=ratio_non_zero;%where are you looking at
 variant=education_non_zero;
 
@@ -214,10 +210,9 @@ r_squared = mdl.Rsquared.Ordinary;
 p_value = mdl.Coefficients.pValue;
 plot(variant, ROI,'.')
 hold on; 
-x_range = [min(variant), max(variant)]; % x 축 범위
+x_range = [min(variant), max(variant)];
 y_pred = mdl.Coefficients.Estimate(1) + mdl.Coefficients.Estimate(2) * x_range; 
 
-% 산점도- 회귀선 그리기
 plot(x_range, y_pred, 'k-', 'LineWidth', 2);
 hold off
 %% group (box plot)
@@ -234,7 +229,7 @@ edugroup_non_zero=edugroup(non_zero_indices);
         edugroup_non_zero=edugroup_non_zero(cutoffPA_indices);
     end
 
-% 각 조합에 대한 라벨 생성.. for character ones..
+% for character ones
 data = cell(4, 1);
 label = cell(4, 1);
 for k= 1:2
@@ -269,31 +264,22 @@ end
 all_text = [];
 for i = 1:numel(label)
     allt=cellstr(label{i, 1});
-    all_text = vertcat(all_text,allt); % 각 셀의 문자열에서 양쪽 공백을 제거한 후 공백으로 결합
+    all_text = vertcat(all_text,allt);
 end
 figure;
 boxplot(cell2mat(data),all_text)
 ylabel('volume (mm)^{3}');
 % xlabel('age,PA');
 
-%group 별 크기 확인
 for n=1:numel(data)
 fprintf('%s: %d/ ',label{n}(1,:),numel(data{n}))
 end
-%% kmeans?
-% 데이터를 오름차순으로 정렬
+%% kmeans
 PA_sorted = sort(education_non_zero);
-
-% 데이터의 총 개수
 num_data = numel(PA_sorted);
-
-% 클러스터 수 설정
 num_clusters = 2;
-
-% 각 클러스터의 크기
 cluster_size = floor(num_data / num_clusters);
 
-% 각 클러스터의 경계값을 찾기
 cutoff_values = zeros(num_clusters - 1, 2);
 for i = 1:num_clusters-1
     max_val = PA_sorted(i * cluster_size);
@@ -301,7 +287,6 @@ for i = 1:num_clusters-1
     cutoff_values(i, :) = [max_val, min_val];
 end
 
-% 각 클러스터의 데이터 포인트 수 확인
 for i = 1:num_clusters
     if i < num_clusters
         fprintf('Cluster %d: %d points\n', i, cluster_size);
@@ -310,10 +295,8 @@ for i = 1:num_clusters
     end
 end
 
-% 각 클러스터의 경계값 출력
 fprintf('Cutoff values between the clusters (max of current, min of next):\n');
 disp(cutoff_values);
-
 
 %% one way ANOVA
 [p, tbl, stats] = anova1(cell2mat(data), all_text);
@@ -348,10 +331,9 @@ r_squared = mdl.Rsquared.Ordinary;
 p_value = mdl.Coefficients.pValue;
 plot(variant, ROI,'.')
 hold on; 
-x_range = [min(variant), max(variant)]; % x 축 범위
+x_range = [min(variant), max(variant)];
 y_pred = mdl.Coefficients.Estimate(1) + mdl.Coefficients.Estimate(2) * x_range; 
 
-% 산점도- 회귀선 그리기
 plot(x_range, y_pred, 'k-', 'LineWidth', 2);
 hold off
 %% other covariates
@@ -429,7 +411,7 @@ tbl.Age_squared = tbl.Age.^2;
 tbl.PA_squared = tbl.PA.^2;
 mdl_quad = fitlm(tbl, 'Hippo ~ Age + Age_squared + Age * PA + Volumes + PA + Education');
 
-% age_range = 0:0.1:100; %나이를 0에서 100까지 연장해보기
+% age_range = 0:0.1:100;
 % age_range_squared = age_range.^2;
 % volumes_range = repmat(mean(tbl.Volumes), size(age_range));
 % pa_range = repmat(mean(tbl.PA), size(age_range));
@@ -491,7 +473,7 @@ end
 end
 hold off;
 set(gca, 'XTick', (0:numel(PAlabel)-1) * (2 * bar_width + group_spacing) + bar_width / 2);
-set(gca, 'XTickLabel', PAlabel);%k를 따라감
+set(gca, 'XTickLabel', PAlabel);
 xlabel('Education');
 ylim([6000 11000])
 ylabel('Hippocampal Volume');
@@ -508,7 +490,7 @@ groupintd=agegroups;
 for k=1:numel(group1)
 for i=1:numel(groupofint)
     edugroupforthis= find(strcmp(groupintd,groupofint{i}) & strcmp(group1d,group1{k}));
-        if i > 1 % 보고 싶은 부분들 위주로 고치기
+        if i > 1 
             prev_edugroupforthis = find(strcmp(groupintd, groupofint{i-1}) & strcmp(group1d, group1{k}));
             [~,p_value] = ttest2(hippo_non_zero(edugroupforthis), hippo_non_zero(prev_edugroupforthis));
             all_p_values = [all_p_values; p_value];
