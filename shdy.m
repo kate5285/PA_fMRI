@@ -61,7 +61,7 @@ for files = 1:2
                 lines = fgetl(fileID);
                 if i == line_num
                     header_tokens = strsplit(lines, ' ');
-                    header_tokens = header_tokens(~cellfun('isempty', header_tokens)); % sometimes empty space bars get inserted..this is for getting rid of them
+                    header_tokens = header_tokens(~cellfun('isempty', header_tokens)); % sometimes empty spaces get inserted..this is for getting rid of them
                     for j = 3:length(header_tokens)
                         headername{j-2} = header_tokens{j};
                     end
@@ -563,7 +563,7 @@ r_squared = mdl.Rsquared.Ordinary;
 p_value = mdl.Coefficients.pValue;
 plot(variant, ROI,'.')
 hold on; 
-x_range = [min(variant), max(variant)]; % x 축 범위
+x_range = [min(variant), max(variant)];
 y_pred = mdl.Coefficients.Estimate(1) + mdl.Coefficients.Estimate(2) * x_range; 
 
 plot(x_range, y_pred, 'k-', 'LineWidth', 2);
