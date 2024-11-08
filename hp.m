@@ -18,10 +18,10 @@ for k = 1:length(pfiles)
             fileStruct.vol = data{2};
 
             if contains(baseFileName, 'lh')
-                l_allfiles{end+1, 1} = fileStruct; % "lh" 파일 추가
+                l_allfiles{end+1, 1} = fileStruct; % "lh"
                 partici(end+1, 1) = str2double(regexp(baseFileName, '^\d+', 'match', 'once'));
             elseif contains(baseFileName, 'rh')
-                r_allfiles{end+1, 1} = fileStruct; % "rh" 파일 추가
+                r_allfiles{end+1, 1} = fileStruct; % "rh"
            end
 end
 clearvars -except r_allfiles l_allfiles pfiles partici
@@ -88,7 +88,6 @@ Kfilename= "D:\서울대\5-1\intern\survey_cop.xlsx";
 datalabel = xlsread(Kfilename, 3, 'A:A');
 numRows = numel(datalabel);
 
-% 파악한 행의 개수만큼 C열의 데이터를 읽어들입니다.
 sex = readcell(Kfilename, 'Sheet', 3, 'Range',sprintf('C3:C%d', numRows + 2));
 age= xlsread(Kfilename, 3, sprintf('D3:D%d', numRows + 2));
 PA= xlsread(Kfilename, 3, sprintf('AG3:AG%d', numRows + 2));
@@ -163,7 +162,7 @@ where=r_combined{1,1}.name(what);
 
 tab = table(names, task,rv, pv, 'VariableNames', {'Name','task', 'r', 'p'});
 disp(tab);
-%% 영역 중 acc랑 p val 작은 거에서 높은 순으로 정렬
+
 nm = ["what", "where", "when"]; 
 P=1;%정확도 중 어디를 볼 것인지
 rv=[];pv=[];names=[];
@@ -186,7 +185,6 @@ for h=1:numel(l_combined{1,1}.name)
 
         figure;
         plot(rel_filtered.(['accuracy' num2str(P)]),mdl.Fitted,'.')
-
 
 end
         [~,sorted]=sort(pv,'ascend');
